@@ -14,9 +14,11 @@ FROM node:24-alpine AS web-builder
 # The web UI lives in a separate repo. Track "master" to match this server's
 # unstable 12.0.0 line; pin to a tag here if you want a reproducible bundle.
 ARG JELLYFIN_WEB_VERSION=master
-RUN apk add --no-cache curl git python3 make g++ gifsicle \
- && curl -L https://github.com/jellyfin/jellyfin-web/archive/${JELLYFIN_WEB_VERSION}.tar.gz | tar zxf - \
- && cd jellyfin-web-* \
+# Clone (rather than download a tarball) because jellyfin-web's webpack build
+# shells out to `git describe` to stamp the bundle with a commit hash.
+RUN apk add --no-cache git python3 make g++ gifsicle \
+ && git clone --depth 1 --branch ${JELLYFIN_WEB_VERSION} https://github.com/jellyfin/jellyfin-web.git /jellyfin-web \
+ && cd /jellyfin-web \
  && npm ci --no-audit --unsafe-perm \
  && npm run build:production \
  && mv dist /dist
