@@ -1,0 +1,33 @@
+[app]
+name = "jellyfin"
+version = "12.0.0"
+description = "The Free Software Media System — your movies, shows, music, and photos, on your own hardware."
+authors = ["Jellyfin Contributors"]
+
+[runtime.container]
+image = "Dockerfile"
+# Jellyfin's HTTP server listens on 8096 inside the container; the OpenHost
+# router terminates TLS and reverse-proxies to it by subdomain.
+port = 8096
+
+[routing]
+health_check = "/health"
+# Jellyfin ships its own authentication (user accounts + API keys) and is
+# accessed by native clients (mobile/TV apps) that can't perform OpenHost's
+# browser SSO, so the whole app is exposed publicly and Jellyfin guards itself.
+public_paths = ["/"]
+
+[[links]]
+name = "dashboard"
+path = "/web/#/dashboard"
+
+[resources]
+# A media server transcoding video needs far more than the platform defaults.
+memory_mb = 4096
+cpu_cores = 2.0
+
+[data]
+# Persistent, backed-up config + metadata + SQLite libraries live in app_data;
+# regenerable transcode/image cache lives in the un-backed-up temp tier.
+app_data = true
+app_temp_data = true
