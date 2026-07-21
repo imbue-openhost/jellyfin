@@ -10,7 +10,7 @@
 
 ARG DOTNET_VERSION=10.0
 
-FROM node:20-alpine AS web-builder
+FROM node:24-alpine AS web-builder
 # The web UI lives in a separate repo. Track "master" to match this server's
 # unstable 12.0.0 line; pin to a tag here if you want a reproducible bundle.
 ARG JELLYFIN_WEB_VERSION=master
