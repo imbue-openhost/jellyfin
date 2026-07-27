@@ -25,6 +25,15 @@ export JELLYFIN_LOG_DIR="${JELLYFIN_DATA_DIR}/log"
 
 mkdir -p "$JELLYFIN_DATA_DIR" "$JELLYFIN_CACHE_DIR" "$JELLYFIN_CONFIG_DIR" "$JELLYFIN_LOG_DIR"
 
+# Pre-seed empty media library folders under the persistent data mount. OpenHost
+# apps don't get a UI for creating arbitrary host folders, so without this the
+# user would have nowhere to point a library at. These are just directories —
+# point Jellyfin libraries at /data/app_data/jellyfin/media/{Movies,Shows,Music}
+# (or upload into them via the file browser). Idempotent; never touched again.
+for lib in Movies Shows Music; do
+  mkdir -p "$JELLYFIN_DATA_DIR/media/$lib"
+done
+
 # Locate the Jellyfin server binary.
 if [ -x /jellyfin/jellyfin ]; then
   JELLYFIN_BIN=/jellyfin/jellyfin
