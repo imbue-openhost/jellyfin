@@ -22,9 +22,10 @@ name = "dashboard"
 path = "/web/#/dashboard"
 
 [resources]
-# A media server transcoding video needs far more than the platform defaults.
-memory_mb = 4096
-cpu_cores = 2.0
+# A media server needs more than the platform defaults; 2 GB / 1 core is
+# comfortable for Jellyfin at idle plus light software transcoding.
+memory_mb = 2048
+cpu_cores = 1.0
 
 [data]
 # Persistent, backed-up config + metadata + SQLite libraries live in app_data;

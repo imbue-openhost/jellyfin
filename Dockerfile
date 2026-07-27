@@ -27,11 +27,15 @@ FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS builder
 WORKDIR /repo
 COPY . .
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
+# Build serially (-m:1, BuildInParallel=false) to keep the publish step's peak
+# memory low enough for small OpenHost VMs; a parallel self-contained publish of
+# all Jellyfin projects can spike host RAM enough to disturb co-located services.
 RUN dotnet publish Jellyfin.Server \
       --configuration Release \
       --output /jellyfin \
       --self-contained \
       --runtime linux-x64 \
+      -m:1 -p:BuildInParallel=false \
       -p:DebugSymbols=false -p:DebugType=none
 
 FROM debian:bookworm-slim AS runtime
