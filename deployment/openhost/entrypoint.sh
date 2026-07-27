@@ -14,7 +14,16 @@ set -eu
 
 export JELLYFIN_DATA_DIR="${OPENHOST_APP_DATA_DIR:-${JELLYFIN_DATA_DIR:-/config}}"
 export JELLYFIN_CACHE_DIR="${OPENHOST_APP_TEMP_DIR:-${JELLYFIN_CACHE_DIR:-/cache}}"
-mkdir -p "$JELLYFIN_DATA_DIR" "$JELLYFIN_CACHE_DIR"
+
+# The official image pins JELLYFIN_CONFIG_DIR/JELLYFIN_LOG_DIR under its
+# ephemeral /config, so server settings (system.xml, which holds the
+# StartupWizardCompleted flag) and logs would be lost on every reload. Anchor
+# them under the persistent data mount instead — this mirrors Jellyfin's own
+# default derivation (DATA_DIR/config, DATA_DIR/log) but on backed-up storage.
+export JELLYFIN_CONFIG_DIR="${JELLYFIN_DATA_DIR}/config"
+export JELLYFIN_LOG_DIR="${JELLYFIN_DATA_DIR}/log"
+
+mkdir -p "$JELLYFIN_DATA_DIR" "$JELLYFIN_CACHE_DIR" "$JELLYFIN_CONFIG_DIR" "$JELLYFIN_LOG_DIR"
 
 # Locate the Jellyfin server binary.
 if [ -x /jellyfin/jellyfin ]; then
